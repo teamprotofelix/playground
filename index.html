@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect to Futures . . .</title>
+
+    <!-- PWA 필수 메타태그 & manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a1f">  <!-- 어두운 우주 배경색 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            color: #e0f2fe;
+            background: radial-gradient(ellipse at center, #0a0a1f 0%, #05050f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            transition: opacity 0.6s ease;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #67e8f9, 0 0 12px #a78bfa;
+            animation: twinkle 1.5s infinite ease-in-out alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1100px;
+            width: 100%;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+        }
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.75);
+            border: 1px solid rgba(103, 232, 249, 0.2);
+            max-width: 100%;
+        }
+        .image-wrapper img {
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .image-wrapper:hover img {
+            transform: scale(1.07) rotate(0.8deg);
+            filter: brightness(1.1) saturate(1.15);
+        }
+        .hover-area {
+            position: absolute;
+            top: 28%; left: 18%;
+            width: 64%; height: 46%;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .hover-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.85);
+            font-size: clamp(2.2rem, 8vw, 4.2rem);
+            font-weight: 800;
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            background: linear-gradient(90deg, #67e8f9, #bae6fd, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            pointer-events: none;
+        }
+        .hover-area:hover .hover-text {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <p class="subtitle">미래를 연결하는 지능의 공간</p>
+        <div class="image-wrapper">
+            <!-- id 추가: 랜덤 이미지 제어용 -->
+            <img id="randomImage" src="" alt="AI Futures">
+            <a href="playground.html" class="hover-area" id="transition-link">
+                <div class="hover-text">Connect to Futures</div>
+            </a>
+        </div>
+        <p class="subtitle" style="margin-top: 38px;">
+            이곳은 별들이 기다리는 장소입니다.
+        </p>           
+    </div>
+
+    <script>
+        // ----------------------------------------------
+        // 1. 랜덤 이미지 설정
+        // ----------------------------------------------
+        // ★ 여기에 표시할 이미지 파일명들을 추가/수정하세요 ★
+        const images = [
+            "futures01.jpg"         // 예시 1
+        ];
+
+        // 랜덤 인덱스 선택
+        const randomIndex = Math.floor(Math.random() * images.length);
+        const selectedImage = images[randomIndex];
+
+        // 이미지 src 설정 (이미지가 같은 폴더에 있다고 가정)
+        const imgElement = document.getElementById('randomImage');
+        if (imgElement) {
+            imgElement.src = selectedImage;
+            // (선택) 이미지 로딩 실패 시 대체 이미지 처리
+            imgElement.onerror = function() {
+                console.warn(`이미지를 불러올 수 없습니다: ${selectedImage}`);
+                this.src = "aicenter.jpg";  // fallback
+            };
+        }
+
+        // ----------------------------------------------
+        // 2. 별 생성 (기존 그대로)
+        // ----------------------------------------------
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 180; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1;
+                star.style.width = star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDuration = `${Math.random() * 2 + 1.2}s`;
+                container.appendChild(star);
+            }
+        }
+
+        // ----------------------------------------------
+        // 3. 부드러운 페이지 전환 (기존 그대로)
+        // ----------------------------------------------
+        const link = document.getElementById('transition-link');
+        if (link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                document.body.style.transition = 'opacity 0.6s ease';
+                document.body.style.opacity = '0';
+                setTimeout(function() {
+                    window.location.href = href;
+                }, 600);
+            });
+        }
+
+        // ----------------------------------------------
+        // 4. 페이지 로드 시 별 생성 (이미지는 이미 위에서 설정됨)
+        // ----------------------------------------------
+        window.onload = createStars;
+
+
+        // ========== PWA: Service Worker 등록 (추가) ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('Service Worker 등록 성공:', registration.scope);
+                }).catch(function(error) {
+                    console.log('Service Worker 등록 실패:', error);
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>
